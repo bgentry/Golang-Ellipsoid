@@ -282,6 +282,8 @@ func (ellipsoid Ellipsoid) Displacement(lat1, lon1, lat2, lon2 float64) (x, y fl
 	return x, y
 }
 
+const degreesPerRadian = 180.0 / math.Pi
+
 /* Location returns the list (latitude,longitude) of a location at a given (x,y)
 displacement from a given location.
 
@@ -291,13 +293,11 @@ The note from Displacement applies.
 
 */
 func (ellipsoid Ellipsoid) Location(lat1, lon1, x, y float64) (lat, lon float64) {
-	degrees_per_radian := 180.0 / math.Pi
-
 	range1 := math.Sqrt(x*x + y*y)
 	bearing1 := math.Atan2(x, y)
 
 	if ellipsoid.Units == Degrees {
-		bearing1 *= degrees_per_radian
+		bearing1 *= degreesPerRadian
 	}
 
 	return ellipsoid.At(lat1, lon1, range1, bearing1)
