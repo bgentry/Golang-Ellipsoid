@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/StefanSchroeder/Golang-Ellipsoid/ellipsoid"
+	"github.com/bgentry/ellipsoid"
 )
 
 func main() {
