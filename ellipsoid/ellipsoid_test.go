@@ -2,13 +2,12 @@
 package ellipsoid
 
 import (
+	"fmt"
+	"math"
 	"runtime"
 	"strconv"
-
 	"testing"
 )
-import "math"
-import "fmt"
 
 func delta_within(test *testing.T, loc string, v float64, t float64, d float64) {
 	diff := math.Abs(v - t)
@@ -36,7 +35,7 @@ type testobject_at struct {
 
 func TestAt(t *testing.T) {
 
-	e1 := Init("WGS84", Degrees, Meter, LongitudeNotSymmetric, BearingNotSymmetric)
+	e1 := New("WGS84", Degrees, Meter, LongitudeNotSymmetric, BearingNotSymmetric)
 
 	all_tests_e1 := []testobject_at{
 		{loc(), -38.369163, 190.874558, 663.027183, 53.574472, -38.3656166574817, 190.880662670944},
@@ -146,7 +145,7 @@ func TestAt(t *testing.T) {
 		delta_within(t, v.loc, lon3, v.lon2, 1e-1)
 	}
 
-	e2 := Init("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
+	e2 := New("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
 
 	all_tests_e2 := []testobject_at{
 		{loc(), -0.582762, 29.118576, 2946.165884, 106.326170, -0.590251306822743, 29.1439759994689},
@@ -270,7 +269,7 @@ type testobject_to struct {
 }
 
 func TestTo(t *testing.T) {
-	e := Init("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
+	e := New("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
 
 	all_tests := []testobject_to{
 		{loc(), -88.000000, 1.000000, -88.000000, 1.000000, 0, 0.0, 0.1},
@@ -565,7 +564,7 @@ func testAirport(t *testing.T) {
 		{loc(), "Changchun to Kiev", 43.87, 125.35, 50.43, 30.52, 6701},
 		{loc(), "Faisalabad to Izmir", 31.41, 73.11, 38.43, 27.15, 4215}}
 
-	e := Init("WGS84", Degrees, Kilometer, LongitudeIsSymmetric, BearingIsSymmetric)
+	e := New("WGS84", Degrees, Kilometer, LongitudeIsSymmetric, BearingIsSymmetric)
 	for i, v := range all_tests {
 		fmt.Printf("Going from %v\n", v.t)
 		r, _ := e.To(v.lat1, v.lon1, v.lat2, v.lon2)
@@ -577,7 +576,7 @@ func testAirport(t *testing.T) {
 
 func TestToLLA(t *testing.T) {
 
-	e1 := Init("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
+	e1 := New("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
 	//  http://sysense.net/products/ecef_lla_converter/index.html
 	all_tests := []testobject_ToECEF{
 		{loc(), 30.2746722, -97.7403306, 0.0, -742507.1, -5462738.5, 3196706.5},
@@ -604,7 +603,7 @@ type testobject_ToECEF struct {
 
 func TestToECEF(t *testing.T) {
 
-	e1 := Init("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
+	e1 := New("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
 
 	all_tests := []testobject_ToECEF{
 		{loc(), 30.2746722, -97.7403306, 0.0, -742507.1, -5462738.5, 3196706.5},
@@ -635,7 +634,7 @@ type testobject_Displace struct {
 }
 
 func TestDisplacement(t *testing.T) {
-	e1 := Init("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
+	e1 := New("WGS84", Degrees, Meter, LongitudeIsSymmetric, BearingNotSymmetric)
 	epsilon := 0.00001
 
 	// These tests are taken from the test suite of Geo::Ellipsoid.

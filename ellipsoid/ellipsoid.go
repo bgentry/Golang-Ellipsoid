@@ -42,8 +42,10 @@ that may be selected for use by ellipsoid.
 
 */
 
-import "math"
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 const (
 	pi           = math.Pi
@@ -106,32 +108,27 @@ func rad2deg(d float64) (r float64) {
 	return d * 180.0 / pi
 }
 
-/* Init
-
-The Init constructor must be called with a list of parameters to set
-the value of the ellipsoid to be used, the value of the units to be
-used for angles and distances, and whether or not the output range
-of longitudes and bearing angles should be symmetric around zero
-or always greater than zero. There is no default constructor, all
-arguments are required; they may not be abbreviated.
-
-Example:
-
-	geo := ellipsoid.Init(
-		"WGS84",  // for possible values see below.
-		ellipsoid.Degrees, // possible values: Degrees or Radians
-		ellipsoid.Meter,   // possible values: Meter, Kilometer,
-				   // Foot, Nm, Mile
-		ellipsoid.LongitudeIsSymmetric, // possible values
-						  // LongitudeIsSymmetric or
-						  // LongitudeNotSymmetric
-		ellipsoid.BearingIsSymmetric    // possible
-						  // values BearingIsSymmetric or
-						  // BearingNotSymmetric
-	)
-
-*/
-func Init(name string, units int, dist_units int, long_sym bool, bear_sym bool) (e Ellipsoid) {
+// New creates a new Ellipsoid. It must be called with a list of parameters to
+// set the value of the ellipsoid to be used, the value of the units to be used
+// for angles and distances, and whether or not the output range of longitudes
+// and bearing angles should be symmetric around zero or always greater than
+// zero.
+//
+// Example:
+//
+//   	geo := ellipsoid.New(
+//   		"WGS84",  // for possible values see below.
+//   		ellipsoid.Degrees, // possible values: Degrees or Radians
+//   		ellipsoid.Meter,   // possible values: Meter, Kilometer,
+//   				   // Foot, Nm, Mile
+//   		ellipsoid.LongitudeIsSymmetric, // possible values
+//   						  // LongitudeIsSymmetric or
+//   						  // LongitudeNotSymmetric
+//   		ellipsoid.BearingIsSymmetric    // possible
+//   						  // values BearingIsSymmetric or
+//   						  // BearingNotSymmetric
+//   	)
+func New(name string, units int, dist_units int, long_sym bool, bear_sym bool) (e Ellipsoid) {
 	m := map[string]ellipse{
 		"AIRY":                  {6377563.396, 299.3249646},
 		"AIRY-MODIFIED":         {6377340.189, 299.3249646},

@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
-import "github.com/StefanSchroeder/Golang-Ellipsoid/ellipsoid"
+import (
+	"fmt"
+
+	"github.com/StefanSchroeder/Golang-Ellipsoid/ellipsoid"
+)
 
 func main() {
 	lat1, lon1 := 37.619002, -122.374843 //SFO
@@ -9,7 +12,7 @@ func main() {
 
 	// Create Ellipsoid object with WGS84-ellipsoid,
 	// angle units are degrees, distance units are meter.
-	geo1 := ellipsoid.Init("WGS84", ellipsoid.Degrees, ellipsoid.Meter, ellipsoid.LongitudeIsSymmetric, ellipsoid.BearingIsSymmetric)
+	geo1 := ellipsoid.New("WGS84", ellipsoid.Degrees, ellipsoid.Meter, ellipsoid.LongitudeIsSymmetric, ellipsoid.BearingIsSymmetric)
 
 	// Calculate the distance and bearing from SFO to LAX.
 	distance, bearing := geo1.To(lat1, lon1, lat2, lon2)
