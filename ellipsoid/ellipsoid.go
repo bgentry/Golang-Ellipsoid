@@ -73,17 +73,17 @@ const (
 type Ellipsoid struct {
 	Ellipse            ellipse
 	Units              int
-	Distance_units     int
+	DistanceUnits      int
 	LongitudeSymmetric bool
 	BearingSymmetric   bool
-	Distance_factor    float64
-	// Having the Distance_factor AND the Distance_units in this struct is redundant
+	DistanceFactor     float64
+	// Having the DistanceFactor AND the DistanceUnits in this struct is redundant
 	// but it looks nicer in the code.
 }
 
 type ellipse struct {
-	Equatorial     float64
-	Inv_flattening float64
+	Equatorial    float64
+	InvFlattening float64
 }
 
 // Shortcut for a location
@@ -220,7 +220,7 @@ func (ellipsoid Ellipsoid) To(lat1, lon1, lat2, lon2 float64) (distance, bearing
 		bearing = rad2deg(bearing)
 	}
 
-	distance /= ellipsoid.Distance_factor
+	distance /= ellipsoid.DistanceFactor
 
 	return
 }
@@ -312,7 +312,7 @@ func (ellipsoid Ellipsoid) calculateTargetlocation(lat1, lon1, distance, bearing
 	eps := 0.5e-13
 
 	a := ellipsoid.Ellipse.Equatorial
-	f := 1.0 / ellipsoid.Ellipse.Inv_flattening
+	f := 1.0 / ellipsoid.Ellipse.InvFlattening
 	r := 1.0 - f
 
 	clat1 := math.Cos(lat1)
@@ -323,7 +323,7 @@ func (ellipsoid Ellipsoid) calculateTargetlocation(lat1, lon1, distance, bearing
 	tu := r * math.Sin(lat1) / clat1
 	faz := bearing
 
-	s := ellipsoid.Distance_factor * distance
+	s := ellipsoid.DistanceFactor * distance
 
 	sf := math.Sin(faz)
 	cf := math.Cos(faz)
@@ -385,7 +385,7 @@ func (ellipsoid Ellipsoid) calculateTargetlocation(lat1, lon1, distance, bearing
 
 func (ellipsoid Ellipsoid) calculateBearing(lat1, lon1, lat2, lon2 float64) (distance, bearing float64) {
 	a := ellipsoid.Ellipse.Equatorial
-	f := 1 / ellipsoid.Ellipse.Inv_flattening
+	f := 1 / ellipsoid.Ellipse.InvFlattening
 
 	if lon1 < 0 {
 		lon1 += twopi
@@ -541,7 +541,7 @@ func (ellipsoid Ellipsoid) ToLLA(x, y, z float64) (lat1, lon1, alt1 float64) {
 	}
 
 	a := ellipsoid.Ellipse.Equatorial
-	f := 1 / ellipsoid.Ellipse.Inv_flattening
+	f := 1 / ellipsoid.Ellipse.InvFlattening
 
 	b := a * (1.0 - f)
 	e := math.Sqrt((a*a - b*b) / (a * a))
@@ -583,7 +583,7 @@ func (ellipsoid Ellipsoid) ToLLA(x, y, z float64) (lat1, lon1, alt1 float64) {
    returns three cartesian coordinates x, y, z */
 func (ellipsoid Ellipsoid) ToECEF(lat1, lon1, alt1 float64) (x, y, z float64) {
 	a := ellipsoid.Ellipse.Equatorial
-	f := 1 / ellipsoid.Ellipse.Inv_flattening
+	f := 1 / ellipsoid.Ellipse.InvFlattening
 
 	b := a * (1.0 - f)
 	e := math.Sqrt((a*a - b*b) / (a * a))
