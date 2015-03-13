@@ -67,14 +67,6 @@ const (
 	Degrees = iota
 	// Radians is one of the possible angle units for input/output.
 	Radians = iota
-	// LongitudeIsSymmetric determines that the output longitude shall be symmetric.
-	LongitudeIsSymmetric = true
-	// LongitudeIsSymmetric determines that the output longitude shall not be symmetric.
-	LongitudeNotSymmetric = false
-	// BearingIsSymmetric determines that the output bearing shall be symmetric.
-	BearingIsSymmetric = true
-	// BearingIsSymmetric determines that the output bearing shall not be symmetric.
-	BearingNotSymmetric = false
 )
 
 // Ellipsoid is the main object to store information about one ellispoid.
@@ -83,7 +75,7 @@ type Ellipsoid struct {
 	Units              int
 	Distance_units     int
 	LongitudeSymmetric bool
-	Bearing_symmetry   bool
+	BearingSymmetric   bool
 	Distance_factor    float64
 	// Having the Distance_factor AND the Distance_units in this struct is redundant
 	// but it looks nicer in the code.
@@ -249,12 +241,11 @@ func (ellipsoid Ellipsoid) At(lat1, lon1, distance, bearing float64) (lat2, lon2
 
 	lat2, lon2 = ellipsoid.calculateTargetlocation(lat1, lon1, distance, bearing)
 
-	if ellipsoid.LongitudeSymmetric == LongitudeIsSymmetric {
+	if ellipsoid.LongitudeSymmetric {
 		if lon2 > pi {
 			lon2 -= twopi
 		}
-	}
-	if ellipsoid.LongitudeSymmetric == LongitudeNotSymmetric {
+	} else {
 		if lon2 < 0.0 {
 			lon2 += twopi
 		}
@@ -515,7 +506,7 @@ func (ellipsoid Ellipsoid) calculateBearing(lat1, lon1, lat2, lon2 float64) (dis
 	}
 
 	// adjust azimuth to (0,360) or (-180,180) as specified
-	if ellipsoid.Bearing_symmetry == BearingIsSymmetric {
+	if ellipsoid.BearingSymmetric {
 		if faz < -(pi) {
 			faz += twopi
 		}
@@ -571,12 +562,11 @@ func (ellipsoid Ellipsoid) ToLLA(x, y, z float64) (lat1, lon1, alt1 float64) {
 	N := a / (math.Sqrt(1 - esq*sphisq))
 	alt1 = p/math.Cos(phi) - N
 
-	if ellipsoid.LongitudeSymmetric == LongitudeIsSymmetric {
+	if ellipsoid.LongitudeSymmetric {
 		if lon1 > pi {
 			lon1 -= twopi
 		}
-	}
-	if ellipsoid.LongitudeSymmetric == LongitudeNotSymmetric {
+	} else {
 		if lon1 < 0.0 {
 			lon1 += twopi
 		}
