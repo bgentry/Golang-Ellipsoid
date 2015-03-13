@@ -108,6 +108,43 @@ func rad2deg(d float64) (r float64) {
 	return d * 180.0 / pi
 }
 
+var grids = map[string]ellipse{
+	"AIRY":                  {6377563.396, 299.3249646},
+	"AIRY-MODIFIED":         {6377340.189, 299.3249646},
+	"AUSTRALIAN":            {6378160.0, 298.25},
+	"BESSEL-1841":           {6377397.155, 299.1528128},
+	"BESSEL-1841-NAMIBIA":   {6377483.865, 299.152813},
+	"CLARKE-1866":           {6378206.400, 294.978698},
+	"CLARKE-1880":           {6378249.145, 293.465},
+	"EVEREST-1830":          {6377276.345, 300.8017},
+	"EVEREST-1948":          {6377304.063, 300.8017},
+	"EVEREST-SABAH-SARAWAK": {6377298.556, 300.801700},
+	"EVEREST-1956":          {6377301.243, 300.801700},
+	"EVEREST-1969":          {6377295.664, 300.801700},
+	"FISHER-1960":           {6378166.0, 298.3},
+	"FISCHER-1960-MODIFIED": {6378155.000, 298.300000},
+	"FISHER-1968":           {6378150.0, 298.3},
+	"GRS80":                 {6378137.0, 298.25722210088},
+	"HELMERT-1906":          {6378200.000, 298.300000},
+	"HOUGH-1956":            {6378270.0, 297.0},
+	"HAYFORD":               {6378388.0, 297.0},
+	"IAU76":                 {6378140.0, 298.257},
+	"INTERNATIONAL":         {6378388.000, 297.000000},
+	"KRASSOVSKY-1938":       {6378245.0, 298.3},
+	"NAD27":                 {6378206.4, 294.9786982138},
+	"NWL-9D":                {6378145.0, 298.25},
+	"SGS85":                 {6378136.000, 298.257000},
+	"SOUTHAMERICAN-1969":    {6378160.0, 298.25},
+	"SOVIET-1985":           {6378136.0, 298.257},
+	"WGS60":                 {6378165.000, 298.300000},
+	"WGS66":                 {6378145.000, 298.250000},
+	"WGS72":                 {6378135.0, 298.26},
+	"WGS84":                 {6378137.0, 298.257223563},
+}
+
+//                           m    ft      km      mi        nm
+var conversions = []float64{1.0, 0.3048, 1000.0, 1609.344, 1852.0}
+
 // New creates a new Ellipsoid. It must be called with a list of parameters to
 // set the value of the ellipsoid to be used, the value of the units to be used
 // for angles and distances, and whether or not the output range of longitudes
@@ -117,60 +154,19 @@ func rad2deg(d float64) (r float64) {
 // Example:
 //
 //   	geo := ellipsoid.New(
-//   		"WGS84",  // for possible values see below.
+//   		"WGS84",  // a grid name from grids
 //   		ellipsoid.Degrees, // possible values: Degrees or Radians
-//   		ellipsoid.Meter,   // possible values: Meter, Kilometer,
-//   				   // Foot, Nm, Mile
-//   		ellipsoid.LongitudeIsSymmetric, // possible values
-//   						  // LongitudeIsSymmetric or
-//   						  // LongitudeNotSymmetric
-//   		ellipsoid.BearingIsSymmetric    // possible
-//   						  // values BearingIsSymmetric or
-//   						  // BearingNotSymmetric
+//   		ellipsoid.Meter,   // possible values: Meter, Kilometer, Foot, Nm, Mile
+//   		true, // whether the longitude is symmetric
+//   		true, // whether the bearing is symmetric
 //   	)
-func New(name string, units int, dist_units int, long_sym bool, bear_sym bool) (e Ellipsoid) {
-	m := map[string]ellipse{
-		"AIRY":                  {6377563.396, 299.3249646},
-		"AIRY-MODIFIED":         {6377340.189, 299.3249646},
-		"AUSTRALIAN":            {6378160.0, 298.25},
-		"BESSEL-1841":           {6377397.155, 299.1528128},
-		"BESSEL-1841-NAMIBIA":   {6377483.865, 299.152813},
-		"CLARKE-1866":           {6378206.400, 294.978698},
-		"CLARKE-1880":           {6378249.145, 293.465},
-		"EVEREST-1830":          {6377276.345, 300.8017},
-		"EVEREST-1948":          {6377304.063, 300.8017},
-		"EVEREST-SABAH-SARAWAK": {6377298.556, 300.801700},
-		"EVEREST-1956":          {6377301.243, 300.801700},
-		"EVEREST-1969":          {6377295.664, 300.801700},
-		"FISHER-1960":           {6378166.0, 298.3},
-		"FISCHER-1960-MODIFIED": {6378155.000, 298.300000},
-		"FISHER-1968":           {6378150.0, 298.3},
-		"GRS80":                 {6378137.0, 298.25722210088},
-		"HELMERT-1906":          {6378200.000, 298.300000},
-		"HOUGH-1956":            {6378270.0, 297.0},
-		"HAYFORD":               {6378388.0, 297.0},
-		"IAU76":                 {6378140.0, 298.257},
-		"INTERNATIONAL":         {6378388.000, 297.000000},
-		"KRASSOVSKY-1938":       {6378245.0, 298.3},
-		"NAD27":                 {6378206.4, 294.9786982138},
-		"NWL-9D":                {6378145.0, 298.25},
-		"SGS85":                 {6378136.000, 298.257000},
-		"SOUTHAMERICAN-1969":    {6378160.0, 298.25},
-		"SOVIET-1985":           {6378136.0, 298.257},
-		"WGS60":                 {6378165.000, 298.300000},
-		"WGS66":                 {6378145.000, 298.250000},
-		"WGS72":                 {6378135.0, 298.26},
-		"WGS84":                 {6378137.0, 298.257223563},
-	}
-
-	e2, ok := m[name]
+func New(name string, angleUnits int, distUnits int, longSym bool, bearSym bool) (e Ellipsoid) {
+	e2, ok := grids[name]
 	if !ok {
 		fmt.Printf("ellipsoid.go: Warning: Invalid ellipse type '%v'\n", name)
 	}
 
-	//                      m    ft      km      mi        nm
-	conversion := []float64{1.0, 0.3048, 1000.0, 1609.344, 1852.0}
-	ellipsoid := Ellipsoid{e2, units, dist_units, long_sym, bear_sym, conversion[dist_units]}
+	ellipsoid := Ellipsoid{e2, angleUnits, distUnits, longSym, bearSym, conversions[distUnits]}
 	return ellipsoid
 }
 
